@@ -69,6 +69,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         var moveDir = GetCurrentMovementVector();
 
+        IsWalking = moveDir != Vector3.zero;
+
+        if (!IsWalking)
+        {
+            return;
+        }
+
         if (CanMove(moveDir))
         {
             Move(moveDir);
@@ -93,18 +100,18 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
 
         transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.deltaTime);
-
-        IsWalking = moveDir != Vector3.zero;
     }
 
     private void HandleInteractions()
     {
         var moveDir = GetCurrentMovementVector();
 
-        if (moveDir != Vector3.zero)
+        if (moveDir == Vector3.zero)
         {
-            lastInteractDir = moveDir;
+            return;
         }
+
+        lastInteractDir = moveDir;
 
         if (Physics.Raycast(transform.position, lastInteractDir, out var hitInfo, maxDistance: 2f, counterLayerMask))
         {
@@ -115,12 +122,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
                     SetSelectedCounter(counter);
                 }
             }
-            else
+            else if (selectedCounter != null)
             {
                 SetSelectedCounter(null);
             }
         }
-        else
+        else if (selectedCounter != null)
         {
             SetSelectedCounter(null);
         }
