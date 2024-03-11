@@ -17,12 +17,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
     private Vector3 lastInteractDir;
-    private ClearCounter selectedCounter;
+    private BaseCounter selectedCounter;
 
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
-        public ClearCounter selectedCounter;
+        public BaseCounter selectedCounter;
     }
 
     public static Player Instance { get; private set; }
@@ -99,11 +99,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         if (Physics.Raycast(transform.position, lastInteractDir, out var hitInfo, maxDistance: 2f, counterLayerMask))
         {
-            if (hitInfo.transform.TryGetComponent(out ClearCounter clearCounter))
+            if (hitInfo.transform.TryGetComponent(out BaseCounter counter))
             {
-                if (clearCounter != selectedCounter)
+                if (counter != selectedCounter)
                 {
-                    SetSelectedCounter(clearCounter);
+                    SetSelectedCounter(counter);
                 }
             }
             else
@@ -117,7 +117,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
     }
 
-    private void SetSelectedCounter(ClearCounter selectedCounter)
+    private void SetSelectedCounter(BaseCounter selectedCounter)
     {
         this.selectedCounter = selectedCounter;
 
@@ -148,6 +148,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public void ClearKitchenObject() => kitchenObject = null;
 
-    public void DropKitchenObjectTo(ClearCounter counter) => GetKitchenObject().SetParentKitchenObject(counter);
+    public void DropKitchenObjectTo(IKitchenObjectParent counter) => GetKitchenObject().SetParentKitchenObject(counter);
     public void PickUpKitchenObject(KitchenObject @object) => @object.SetParentKitchenObject(this);
 }
