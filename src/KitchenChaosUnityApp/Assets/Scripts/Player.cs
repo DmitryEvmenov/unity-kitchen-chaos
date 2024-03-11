@@ -164,6 +164,15 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public void ClearKitchenObject() => kitchenObject = null;
 
-    public void DropKitchenObjectTo(IKitchenObjectParent counter) => GetKitchenObject().SetParentKitchenObject(counter);
+    public void PutDownKitchenObjectTo(IKitchenObjectParent counter) => GetKitchenObject().SetParentKitchenObject(counter);
+
     public void PickUpKitchenObject(KitchenObject @object) => @object.SetParentKitchenObject(this);
+
+    public void RefreshSelectedCounter()
+    {
+        if (!selectedCounter?.CanInteract(this) ?? false)
+        {
+            SetSelectedCounter(null);
+        }
+    }
 }

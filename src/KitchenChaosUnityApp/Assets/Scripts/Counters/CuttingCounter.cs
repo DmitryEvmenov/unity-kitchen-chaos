@@ -18,59 +18,60 @@ public class CuttingCounter : BaseCounter
 
     public event EventHandler OnCut;
 
-    public override void Interact(Player player)
+    protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
+
+    private void HandlePickUpPutDownInteraction(Player player)
     {
         if (HasKitchenObject)
         {
-            ResetCuttingProgress();
             player.PickUpKitchenObject(GetKitchenObject());
         }
-        else
+        else if (player.HasKitchenObject)
         {
-            if (player.HasKitchenObject)
-            {
-                player.DropKitchenObjectTo(this);
-
-                ResetCuttingProgress();
-                NotifyUpdateCuttingProgress();
-            }
+            player.PutDownKitchenObjectTo(this);
         }
+
+        ResetCuttingProgress();
     }
 
-    public override void InteractAlternate(Player player)
+    protected override void OnInteractAlternate(Player player) => HandleCuttingInteraction(player);
+
+    private void HandleCuttingInteraction(Player player)
     {
-        if (HasKitchenObject)
+        if (!HasKitchenObject)
         {
-            var currentKitchenObject = GetKitchenObject();
-            if (!HasValidRecipeFor(currentKitchenObject.KitchenObjectSO))
-            {
-                return;
-            }
+            return;
+        }
 
-            cuttingProgress++;
+        var currentKitchenObject = GetKitchenObject();
+        if (!HasValidRecipeFor(currentKitchenObject.KitchenObjectSO))
+        {
+            return;
+        }
 
-            var recipeSO = GetCuttingRecipeSO(currentKitchenObject.KitchenObjectSO);
+        cuttingProgress++;
 
-            NotifyUpdateCuttingProgress(recipeSO.cuttingProgressMax);
-            OnCut?.Invoke(this, EventArgs.Empty);
+        var recipeSO = GetCuttingRecipeSO(currentKitchenObject.KitchenObjectSO);
 
-            if (cuttingProgress >= recipeSO.cuttingProgressMax)
-            {
-                currentKitchenObject.DestroySelf();
-                KitchenObject.Spawn(recipeSO.output, kitchenObjectParent: this);
-            }
+        NotifyUpdateCuttingProgress(recipeSO.cuttingProgressMax);
+        OnCut?.Invoke(this, EventArgs.Empty);
+
+        if (cuttingProgress >= recipeSO.cuttingProgressMax)
+        {
+            currentKitchenObject.DestroySelf();
+            KitchenObject.Spawn(recipeSO.output, kitchenObjectParent: this);
         }
     }
 
-    private void NotifyUpdateCuttingProgress(int? cuttingProgressMax = null) => 
+    private void NotifyUpdateCuttingProgress(int? cuttingProgressMax = null) =>
         OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = (float)cuttingProgress / cuttingProgressMax ?? 1 });
 
 
-    public override bool CanInteract(Player player) => 
-        HasKitchenObject 
+    public override bool CanInteract(Player player) =>
+        HasKitchenObject
             || (player.HasKitchenObject && HasValidRecipeFor(player.GetKitchenObject().KitchenObjectSO));
 
-    private bool HasValidRecipeFor(KitchenObjectSO kitchenObjectSO) => 
+    private bool HasValidRecipeFor(KitchenObjectSO kitchenObjectSO) =>
         cuttingRecipeSOArray.Any(recipes => recipes.input == kitchenObjectSO);
 
     private CuttingRecipeSO GetCuttingRecipeSO(KitchenObjectSO inputKitchenObjectSO) =>

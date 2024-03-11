@@ -6,18 +6,17 @@ public class ClearCounter : BaseCounter
 {
     [SerializeField] private KitchenObjectSO KitchenObjectSO;
 
-    public override void Interact(Player player)
+    protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
+
+    private void HandlePickUpPutDownInteraction(Player player)
     {
         if (HasKitchenObject)
         {
             player.PickUpKitchenObject(GetKitchenObject());
         }
-        else
+        else if (player.HasKitchenObject)
         {
-            if (player.HasKitchenObject)
-            {
-                player.DropKitchenObjectTo(this);
-            }
+            player.PutDownKitchenObjectTo(this);
         }
     }
 

@@ -4,13 +4,7 @@ using UnityEngine;
 
 public class TrashCounter : BaseCounter
 {
-    public override void Interact(Player player)
-    {
-        if (player.HasKitchenObject)
-        {
-            player.GetKitchenObject().DestroySelf();
-        }
-    }
+    protected override void OnInteract(Player player) => player.GetKitchenObject().DestroySelf();
 
     public override bool CanInteract(Player player) => player.HasKitchenObject;
 }

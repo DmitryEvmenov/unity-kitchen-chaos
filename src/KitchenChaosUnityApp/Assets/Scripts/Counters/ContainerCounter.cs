@@ -9,12 +9,16 @@ public class ContainerCounter : BaseCounter
 
     public event EventHandler OnPlayerGrabbedObject;
 
-    public override void Interact(Player player)
+    protected override void OnInteract(Player player) => HandleSpawnNewPickUpInteraction(player);
+
+    private void HandleSpawnNewPickUpInteraction(Player player)
     {
-        KitchenObject.Spawn(kitchenObjectSO, kitchenObjectParent: this);
-        player.PickUpKitchenObject(GetKitchenObject());
+        var newSpawnedObject = KitchenObject.Spawn(kitchenObjectSO);
+
+        player.PickUpKitchenObject(newSpawnedObject);
+
         OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
     }
 
-    public override bool CanInteract(Player player) => !HasKitchenObject && !player.HasKitchenObject;
+    public override bool CanInteract(Player player) => !player.HasKitchenObject;
 }
