@@ -14,6 +14,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d168619fddcbb5c4aad3767f7a8d2316,
         type: 2}
+    - target: {fileID: 6726277844367804280, guid: cf98a31085642244887ac83d2c5c6ee7,
+        type: 3}
+      propertyPath: kitchenObjectSO
+      value: 
+      objectReference: {fileID: 11400000, guid: d168619fddcbb5c4aad3767f7a8d2316,
+        type: 2}
     - target: {fileID: 7943985974430450181, guid: cf98a31085642244887ac83d2c5c6ee7,
         type: 3}
       propertyPath: m_Sprite

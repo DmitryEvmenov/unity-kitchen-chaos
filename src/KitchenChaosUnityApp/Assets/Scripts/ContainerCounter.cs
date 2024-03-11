@@ -5,19 +5,16 @@ using UnityEngine;
 
 public class ContainerCounter : BaseCounter
 {
-    [SerializeField] private KitchenObjectSO KitchenObjectSO;
+    [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
     public event EventHandler OnPlayerGrabbedObject;
 
     public override void Interact(Player player)
     {
-        InstantiateNewKitchenObject();
+        KitchenObject.Spawn(kitchenObjectSO, kitchenObjectParent: this);
         player.PickUpKitchenObject(GetKitchenObject());
         OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
     }
-
-    private void InstantiateNewKitchenObject() =>
-        Instantiate(KitchenObjectSO.prefab).GetComponent<KitchenObject>().SetParentKitchenObject(this);
 
     public override bool CanInteract(Player player) => !HasKitchenObject && !player.HasKitchenObject;
 }
