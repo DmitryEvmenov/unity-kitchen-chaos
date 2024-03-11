@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 public class SelectedCounterVisual : MonoBehaviour
 {
     [SerializeField] private BaseCounter baseCounter;
-    [SerializeField] private GameObject visualGameObject;
+    [SerializeField] private GameObject[] visualGameObjectsArray;
 
     private void Start()
     {
@@ -24,13 +25,7 @@ public class SelectedCounterVisual : MonoBehaviour
         }
     }
 
-    private void Show()
-    {
-        visualGameObject.SetActive(true);
-    }
+    private void Show() => Array.ForEach(visualGameObjectsArray, vo => vo.SetActive(true));
 
-    private void Hide()
-    {
-        visualGameObject.SetActive(false);
-    }
+    private void Hide() => Array.ForEach(visualGameObjectsArray, vo => vo.SetActive(false));
 }

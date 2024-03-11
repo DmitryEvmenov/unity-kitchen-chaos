@@ -101,7 +101,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         {
             if (hitInfo.transform.TryGetComponent(out BaseCounter counter))
             {
-                if (counter != selectedCounter)
+                if (counter != selectedCounter && counter.CanInteract(this))
                 {
                     SetSelectedCounter(counter);
                 }

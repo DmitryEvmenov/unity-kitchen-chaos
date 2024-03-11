@@ -221,7 +221,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseCounter: {fileID: 262164835296688794}
-  visualGameObject: {fileID: 4763083483057120964}
+  visualGameObjectsArray:
+  - {fileID: 4763083483057120964}
 --- !u!1 &4763083483057120964 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8489276541531669327, guid: 0004cb1e11ad014419b943c7da960724,
