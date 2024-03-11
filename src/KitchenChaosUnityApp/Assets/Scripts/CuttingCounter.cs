@@ -22,6 +22,7 @@ public class CuttingCounter : BaseCounter
     {
         if (HasKitchenObject)
         {
+            ResetCuttingProgress();
             player.PickUpKitchenObject(GetKitchenObject());
         }
         else
@@ -30,7 +31,7 @@ public class CuttingCounter : BaseCounter
             {
                 player.DropKitchenObjectTo(this);
 
-                cuttingProgress = 0;
+                ResetCuttingProgress();
                 NotifyUpdateCuttingProgress();
             }
         }
@@ -74,4 +75,10 @@ public class CuttingCounter : BaseCounter
 
     private CuttingRecipeSO GetCuttingRecipeSO(KitchenObjectSO inputKitchenObjectSO) =>
         cuttingRecipeSOArray.First(recipes => recipes.input == inputKitchenObjectSO);
+
+    private void ResetCuttingProgress()
+    {
+        cuttingProgress = 0;
+        NotifyUpdateCuttingProgress();
+    }
 }
