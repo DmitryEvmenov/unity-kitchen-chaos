@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class StoveCounter : BaseCounter, IHasProgress
 {
@@ -40,33 +39,37 @@ public class StoveCounter : BaseCounter, IHasProgress
                 ? GetStovingRecipeSO(kitchenObject.KitchenObjectSO)
                 : GetStovingRecipeSOForCooked(kitchenObject.KitchenObjectSO);
 
-            if (cookingState == CookingState.Cooking && cookingProgressTimer < recipeSO.secondsToCook)
+
+            if (Doing(CookingState.Cooking, recipeSO.secondsToCook))
             {
                 NotifyUpdateCookingProgress(cookingProgressTimer, recipeSO.secondsToCook);
             }
-            else if (cookingState == CookingState.Cooking && cookingProgressTimer >= recipeSO.secondsToCook)
+            else if (Done(CookingState.Cooking, recipeSO.secondsToCook))
             {
-                cookingState = CookingState.Burning;
-                cookingProgressTimer = 0;
-                NotifyCookingStateChanged();
-                NotifyUpdateCookingProgress();
-                kitchenObject.DestroySelf();
-                KitchenObject.Spawn(recipeSO.outputWhenCooked, this);
+                HandleStateChange(CookingState.Burning, kitchenObject, recipeSO.outputWhenCooked);
             }
-            else if (cookingState == CookingState.Burning && cookingProgressTimer < recipeSO.secondsToBurnAfterCooked)
+            else if (Doing(CookingState.Burning, recipeSO.secondsToBurnAfterCooked))
             {
-                NotifyUpdateCookingProgress(cookingProgressTimer, recipeSO.secondsToBurnAfterCooked);
+                NotifyUpdateCookingProgress(cookingProgressTimer, recipeSO.secondsToBurnAfterCooked, Color.red);
             }
-            else if (cookingState == CookingState.Burning && cookingProgressTimer >= recipeSO.secondsToBurnAfterCooked)
+            else if (Done(CookingState.Burning, recipeSO.secondsToBurnAfterCooked))
             {
-                cookingState = CookingState.Spoiled;
-                cookingProgressTimer = 0;
-                NotifyCookingStateChanged();
-                NotifyUpdateCookingProgress();
-                kitchenObject.DestroySelf();
-                KitchenObject.Spawn(recipeSO.outputWhenBurned, this);
+                HandleStateChange(CookingState.Spoiled, kitchenObject, recipeSO.outputWhenBurned);
             }
+
+            bool Doing(CookingState state, int maxSeconds) => cookingState == state && cookingProgressTimer < maxSeconds;
+            bool Done(CookingState state, int maxSeconds) => cookingState == state && cookingProgressTimer >= maxSeconds;
         }
+    }
+
+    private void HandleStateChange(CookingState newState, KitchenObject currentKitchenObject, KitchenObjectSO newObjectToSpawnSO)
+    {
+        cookingState = newState;
+        cookingProgressTimer = 0;
+        NotifyCookingStateChanged();
+        NotifyUpdateCookingProgress();
+        currentKitchenObject.DestroySelf();
+        KitchenObject.Spawn(newObjectToSpawnSO, this);
     }
 
     protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
@@ -87,9 +90,9 @@ public class StoveCounter : BaseCounter, IHasProgress
         ResetCookingProgress();
     }
 
-    public override void InteractAlternate(Player player) => HandleCookingInteraction(player);
+    public override void InteractAlternate(Player player) => HandleCookingInteraction();
 
-    private void HandleCookingInteraction(Player player)
+    private void HandleCookingInteraction()
     {
         if ((!HasKitchenObject || !HasAnyValidRecipeFor(GetKitchenObject().KitchenObjectSO)) && cookingState != CookingState.Spoiled)
         {
@@ -141,8 +144,8 @@ public class StoveCounter : BaseCounter, IHasProgress
         NotifyCookingStateChanged();
     }
 
-    private void NotifyUpdateCookingProgress(float progressTimer = 0, int? cookingProgressMaxSeconds = null) =>
-        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = progressTimer / cookingProgressMaxSeconds ?? 1 });
+    private void NotifyUpdateCookingProgress(float progressTimer = 0, int? cookingProgressMaxSeconds = null, Color? color = null) =>
+        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = progressTimer / cookingProgressMaxSeconds ?? 1, progressColor = color });
 
     private void NotifyCookingStateChanged() => OnCookingStateChanged?.Invoke(this, new OnCookingStateChangedEventArgs { cookingState = cookingState });
 }

@@ -15,5 +15,5 @@ MonoBehaviour:
   input: {fileID: 11400000, guid: d168619fddcbb5c4aad3767f7a8d2316, type: 2}
   outputWhenCooked: {fileID: 11400000, guid: 844b033337fe7a74585842aa97ebfa6a, type: 2}
   outputWhenBurned: {fileID: 11400000, guid: f399a9b3d779b7946bcf7d49d69b234b, type: 2}
-  secondsToCook: 5
-  secondsToBurnAfterCooked: 4
+  secondsToCook: 6
+  secondsToBurnAfterCooked: 3
