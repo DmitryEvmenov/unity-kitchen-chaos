@@ -78,9 +78,25 @@ public class StoveCounter : BaseCounter, IHasProgress
     {
         var hasValidCookingRecipeForPlayerObject = player.HasKitchenObject && HasValidCookingRecipeFor(player.GetKitchenObject().KitchenObjectSO);
 
-        if (HasKitchenObject && (!player.HasKitchenObject || hasValidCookingRecipeForPlayerObject))
+        if (HasKitchenObject)
         {
-            player.PickUpKitchenObject(GetKitchenObject());
+            if (player.HasKitchenObject && player.GetKitchenObject().TryGetPlate(out var plate))
+            {
+                var kitchenObject = GetKitchenObject();
+
+                if (plate.TryAddIngredient(kitchenObject.KitchenObjectSO))
+                {
+                    kitchenObject.DestroySelf();
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else if (!player.HasKitchenObject || hasValidCookingRecipeForPlayerObject)
+            {
+                player.PickUpKitchenObject(GetKitchenObject());
+            }
         }
         else if (hasValidCookingRecipeForPlayerObject)
         {
@@ -90,7 +106,7 @@ public class StoveCounter : BaseCounter, IHasProgress
         ResetCookingProgress();
     }
 
-    public override void InteractAlternate(Player player) => HandleCookingInteraction();
+    protected override void OnInteractAlternate(Player player) => HandleCookingInteraction();
 
     private void HandleCookingInteraction()
     {
