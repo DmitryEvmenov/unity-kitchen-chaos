@@ -106,7 +106,7 @@ public class StoveCounter : BaseCounter, IHasProgress
         ResetCookingProgress();
     }
 
-    public override void InteractAlternate(Player player) => HandleCookingInteraction();
+    protected override void OnInteractAlternate(Player player) => HandleCookingInteraction();
 
     private void HandleCookingInteraction()
     {

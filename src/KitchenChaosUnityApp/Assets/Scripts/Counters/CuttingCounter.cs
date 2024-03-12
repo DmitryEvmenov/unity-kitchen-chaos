@@ -48,9 +48,9 @@ public class CuttingCounter : BaseCounter, IHasProgress
         ResetCuttingProgress();
     }
 
-    protected override void OnInteractAlternate(Player player) => HandleCuttingInteraction(player);
+    protected override void OnInteractAlternate(Player player) => HandleCuttingInteraction();
 
-    private void HandleCuttingInteraction(Player player)
+    private void HandleCuttingInteraction()
     {
         if (!HasKitchenObject)
         {
