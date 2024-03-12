@@ -1,26 +1,37 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static CuttingCounter;
+
+public class OnProgressChangedEventArgs : EventArgs
+{
+    public float progressNormalized;
+    public Color? progressColor;
+}
 
 public class ProgressBarUI : MonoBehaviour
 {
     [SerializeField] private Image barImage;
-    [SerializeField] private CuttingCounter cuttingCounter;
+    [SerializeField] private Color defaultColor;
+    // todo: this is a workaround solution to let pass interface type as serializedField
+    [SerializeField] GameObject progressibleCounterGameObject;
+    private IHasProgress progressibleCounter => progressibleCounterGameObject.GetComponent<IHasProgress>();
 
     private void Start()
     {
-        cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+        progressibleCounter.OnProgressChanged += ProgressibleCounter_OnProgressChanged;
 
         barImage.fillAmount = 0f;
+        barImage.color = defaultColor;
 
         Hide();
     }
 
-    private void CuttingCounter_OnProgressChanged(object sender, OnProgressChangedEventArgs e) 
+    private void ProgressibleCounter_OnProgressChanged(object sender, OnProgressChangedEventArgs e) 
     {
         barImage.fillAmount = e.progressNormalized;
+        barImage.color = e.progressColor.GetValueOrDefault(defaultColor);
 
         if (e.progressNormalized == 0f || e.progressNormalized == 1f)
         {

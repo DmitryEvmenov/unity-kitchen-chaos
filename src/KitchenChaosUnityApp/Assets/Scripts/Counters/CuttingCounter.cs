@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CuttingCounter : BaseCounter
+public class CuttingCounter : BaseCounter, IHasProgress
 {
     [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
 
     private int cuttingProgress;
 
     public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
-    public class OnProgressChangedEventArgs : EventArgs
-    {
-        public float progressNormalized;
-    }
 
     public event EventHandler OnCut;
 
@@ -22,11 +18,13 @@ public class CuttingCounter : BaseCounter
 
     private void HandlePickUpPutDownInteraction(Player player)
     {
-        if (HasKitchenObject)
+        var hasValidRecipeForPlayerObject = player.HasKitchenObject && HasValidRecipeFor(player.GetKitchenObject().KitchenObjectSO);
+
+        if (HasKitchenObject && (!player.HasKitchenObject || hasValidRecipeForPlayerObject))
         {
             player.PickUpKitchenObject(GetKitchenObject());
         }
-        else if (player.HasKitchenObject)
+        else if (hasValidRecipeForPlayerObject)
         {
             player.PutDownKitchenObjectTo(this);
         }
