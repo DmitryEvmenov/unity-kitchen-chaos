@@ -22,6 +22,7 @@ public class StoveCounterVisual : MonoBehaviour
                 break;
             case StoveCounter.CookingState.Cooking:
             case StoveCounter.CookingState.Burning:
+            case StoveCounter.CookingState.Spoiled:
                 Show();
                 break;
             default:

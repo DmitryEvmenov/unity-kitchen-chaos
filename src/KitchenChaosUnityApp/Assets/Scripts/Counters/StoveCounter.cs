@@ -3,19 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class StoveCounter : BaseCounter, IHasProgress
 {
     [SerializeField] private StovingRecipeSO[] stovingRecipeSOArray;
 
-    private int cookingProgressTimeSeconds;
+    private float cookingProgressTimer;
     private CookingState cookingState;
 
     public enum CookingState
     {
         NoCooking,
         Cooking,
-        Burning
+        Burning,
+        Spoiled,
     }
 
     public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
@@ -27,17 +29,57 @@ public class StoveCounter : BaseCounter, IHasProgress
         public CookingState cookingState;
     }
 
+    private void Update()
+    {
+        if (HasKitchenObject && (cookingState == CookingState.Cooking || cookingState == CookingState.Burning))
+        {
+            cookingProgressTimer += Time.deltaTime;
+
+            var kitchenObject = GetKitchenObject();
+            var recipeSO = cookingState == CookingState.Cooking
+                ? GetStovingRecipeSO(kitchenObject.KitchenObjectSO)
+                : GetStovingRecipeSOForCooked(kitchenObject.KitchenObjectSO);
+
+            if (cookingState == CookingState.Cooking && cookingProgressTimer < recipeSO.secondsToCook)
+            {
+                NotifyUpdateCookingProgress(cookingProgressTimer, recipeSO.secondsToCook);
+            }
+            else if (cookingState == CookingState.Cooking && cookingProgressTimer >= recipeSO.secondsToCook)
+            {
+                cookingState = CookingState.Burning;
+                cookingProgressTimer = 0;
+                NotifyCookingStateChanged();
+                NotifyUpdateCookingProgress();
+                kitchenObject.DestroySelf();
+                KitchenObject.Spawn(recipeSO.outputWhenCooked, this);
+            }
+            else if (cookingState == CookingState.Burning && cookingProgressTimer < recipeSO.secondsToBurnAfterCooked)
+            {
+                NotifyUpdateCookingProgress(cookingProgressTimer, recipeSO.secondsToBurnAfterCooked);
+            }
+            else if (cookingState == CookingState.Burning && cookingProgressTimer >= recipeSO.secondsToBurnAfterCooked)
+            {
+                cookingState = CookingState.Spoiled;
+                cookingProgressTimer = 0;
+                NotifyCookingStateChanged();
+                NotifyUpdateCookingProgress();
+                kitchenObject.DestroySelf();
+                KitchenObject.Spawn(recipeSO.outputWhenBurned, this);
+            }
+        }
+    }
+
     protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
 
     private void HandlePickUpPutDownInteraction(Player player)
     {
-        var hasValidRecipeForPlayerObject = player.HasKitchenObject && HasValidRecipeFor(player.GetKitchenObject().KitchenObjectSO);
+        var hasValidCookingRecipeForPlayerObject = player.HasKitchenObject && HasValidCookingRecipeFor(player.GetKitchenObject().KitchenObjectSO);
 
-        if (HasKitchenObject && (!player.HasKitchenObject || hasValidRecipeForPlayerObject))
+        if (HasKitchenObject && (!player.HasKitchenObject || hasValidCookingRecipeForPlayerObject))
         {
             player.PickUpKitchenObject(GetKitchenObject());
         }
-        else if (hasValidRecipeForPlayerObject)
+        else if (hasValidCookingRecipeForPlayerObject)
         {
             player.PutDownKitchenObjectTo(this);
         }
@@ -49,27 +91,26 @@ public class StoveCounter : BaseCounter, IHasProgress
 
     private void HandleCookingInteraction(Player player)
     {
-        if (!HasKitchenObject || !HasValidRecipeFor(GetKitchenObject().KitchenObjectSO))
+        if ((!HasKitchenObject || !HasAnyValidRecipeFor(GetKitchenObject().KitchenObjectSO)) && cookingState != CookingState.Spoiled)
         {
             return;
         }
 
+        var kitchenObjectSO = GetKitchenObject().KitchenObjectSO;
+
         switch (cookingState)
         {
             case CookingState.NoCooking:
-                cookingState = CookingState.Cooking;
-                cookingProgressTimeSeconds++;
-                NotifyUpdateCuttingProgress(5);
+                var hasCookingRecipe = HasValidCookingRecipeFor(kitchenObjectSO);
+
+                cookingState = hasCookingRecipe
+                    ? CookingState.Cooking
+                    : CookingState.Burning;
                 break;
             case CookingState.Cooking:
-                cookingState = CookingState.Burning;
-                cookingProgressTimeSeconds++;
-                NotifyUpdateCuttingProgress(3);
-                break;
             case CookingState.Burning:
+            case CookingState.Spoiled:
                 cookingState = CookingState.NoCooking;
-                cookingProgressTimeSeconds = 0;
-                NotifyUpdateCuttingProgress();
                 break;
         }
 
@@ -78,21 +119,30 @@ public class StoveCounter : BaseCounter, IHasProgress
 
     public override bool CanInteract(Player player) =>
             HasKitchenObject
-                || (player.HasKitchenObject && HasValidRecipeFor(player.GetKitchenObject().KitchenObjectSO));
+                || (player.HasKitchenObject && HasValidCookingRecipeFor(player.GetKitchenObject().KitchenObjectSO));
 
-    private bool HasValidRecipeFor(KitchenObjectSO kitchenObjectSO) =>
+    private bool HasAnyValidRecipeFor(KitchenObjectSO kitchenObjectSO) =>
+        stovingRecipeSOArray.Any(recipes => recipes.input == kitchenObjectSO || recipes.outputWhenCooked == kitchenObjectSO);
+
+    private bool HasValidCookingRecipeFor(KitchenObjectSO kitchenObjectSO) =>
         stovingRecipeSOArray.Any(recipes => recipes.input == kitchenObjectSO);
+
+    private StovingRecipeSO GetStovingRecipeSO(KitchenObjectSO inputKitchenObjectSO) =>
+        stovingRecipeSOArray.FirstOrDefault(recipes => recipes.input == inputKitchenObjectSO);
+
+    private StovingRecipeSO GetStovingRecipeSOForCooked(KitchenObjectSO cookedKitchenObjectSO) =>
+        stovingRecipeSOArray.FirstOrDefault(recipes => recipes.outputWhenCooked == cookedKitchenObjectSO);
 
     private void ResetCookingProgress()
     {
-        cookingProgressTimeSeconds = 0;
+        cookingProgressTimer = 0;
         cookingState = CookingState.NoCooking;
-        NotifyUpdateCuttingProgress();
+        NotifyUpdateCookingProgress();
         NotifyCookingStateChanged();
     }
 
-    private void NotifyUpdateCuttingProgress(int? cookingProgressMaxSeconds = null) =>
-        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = (float)cookingProgressTimeSeconds / cookingProgressMaxSeconds ?? 1 });
+    private void NotifyUpdateCookingProgress(float progressTimer = 0, int? cookingProgressMaxSeconds = null) =>
+        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = progressTimer / cookingProgressMaxSeconds ?? 1 });
 
     private void NotifyCookingStateChanged() => OnCookingStateChanged?.Invoke(this, new OnCookingStateChangedEventArgs { cookingState = cookingState });
 }
