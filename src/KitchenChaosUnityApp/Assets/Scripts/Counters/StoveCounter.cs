@@ -9,8 +9,23 @@ public class StoveCounter : BaseCounter, IHasProgress
     [SerializeField] private StovingRecipeSO[] stovingRecipeSOArray;
 
     private int cookingProgressTimeSeconds;
+    private CookingState cookingState;
+
+    public enum CookingState
+    {
+        NoCooking,
+        Cooking,
+        Burning
+    }
 
     public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
+
+    public event EventHandler<OnCookingStateChangedEventArgs> OnCookingStateChanged;
+
+    public class OnCookingStateChangedEventArgs : EventArgs
+    {
+        public CookingState cookingState;
+    }
 
     protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
 
@@ -30,9 +45,35 @@ public class StoveCounter : BaseCounter, IHasProgress
         ResetCookingProgress();
     }
 
-    public override void InteractAlternate(Player player)
+    public override void InteractAlternate(Player player) => HandleCookingInteraction(player);
+
+    private void HandleCookingInteraction(Player player)
     {
-        base.InteractAlternate(player);
+        if (!HasKitchenObject || !HasValidRecipeFor(GetKitchenObject().KitchenObjectSO))
+        {
+            return;
+        }
+
+        switch (cookingState)
+        {
+            case CookingState.NoCooking:
+                cookingState = CookingState.Cooking;
+                cookingProgressTimeSeconds++;
+                NotifyUpdateCuttingProgress(5);
+                break;
+            case CookingState.Cooking:
+                cookingState = CookingState.Burning;
+                cookingProgressTimeSeconds++;
+                NotifyUpdateCuttingProgress(3);
+                break;
+            case CookingState.Burning:
+                cookingState = CookingState.NoCooking;
+                cookingProgressTimeSeconds = 0;
+                NotifyUpdateCuttingProgress();
+                break;
+        }
+
+        NotifyCookingStateChanged();
     }
 
     public override bool CanInteract(Player player) =>
@@ -45,9 +86,13 @@ public class StoveCounter : BaseCounter, IHasProgress
     private void ResetCookingProgress()
     {
         cookingProgressTimeSeconds = 0;
+        cookingState = CookingState.NoCooking;
         NotifyUpdateCuttingProgress();
+        NotifyCookingStateChanged();
     }
 
-    private void NotifyUpdateCuttingProgress(int? cookingProgressTimePassedSeconds = null) =>
-        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = (float)cookingProgressTimeSeconds / cookingProgressTimePassedSeconds ?? 1 });
+    private void NotifyUpdateCuttingProgress(int? cookingProgressMaxSeconds = null) =>
+        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs { progressNormalized = (float)cookingProgressTimeSeconds / cookingProgressMaxSeconds ?? 1 });
+
+    private void NotifyCookingStateChanged() => OnCookingStateChanged?.Invoke(this, new OnCookingStateChangedEventArgs { cookingState = cookingState });
 }
