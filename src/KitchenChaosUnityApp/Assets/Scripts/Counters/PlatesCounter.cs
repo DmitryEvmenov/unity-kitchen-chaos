@@ -18,25 +18,34 @@ public class PlatesCounter : BaseCounter
     private void Update()
     {
         spawnPlateTimer += Time.deltaTime;
+
         if (spawnPlateTimer >= spawnPlateTimerMax)
         {
-            spawnPlateTimer = 0;
+            HandleSpawnVisualPlate();
+        }
+    }
 
-            if (platesSpawnedAmount < platesSpawnAmountMax)
-            {
-                platesSpawnedAmount++;
+    private void HandleSpawnVisualPlate()
+    {
+        spawnPlateTimer = 0;
 
-                OnPlateSpawned?.Invoke(this, EventArgs.Empty);
-            }
+        if (platesSpawnedAmount < platesSpawnAmountMax)
+        {
+            platesSpawnedAmount++;
+
+            OnPlateSpawned?.Invoke(this, EventArgs.Empty);
         }
     }
 
     public override bool CanInteract(Player player) => !player.HasKitchenObject && platesSpawnedAmount > 0;
 
+    protected override void OnInteract(Player player) => HandlePickUpPlateInteraction(player);
 
-    protected override void OnInteract(Player player)
+    private void HandlePickUpPlateInteraction(Player player)
     {
-        KitchenObject.Spawn(plateKichenObjectSO, player);
+        var newPlate = KitchenObject.Spawn(plateKichenObjectSO);
+        player.PickUpKitchenObject(newPlate);
+
         platesSpawnedAmount--;
         OnPlateRemoved?.Invoke(this, EventArgs.Empty);
     }

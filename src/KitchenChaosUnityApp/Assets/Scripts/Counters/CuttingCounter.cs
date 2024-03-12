@@ -20,9 +20,25 @@ public class CuttingCounter : BaseCounter, IHasProgress
     {
         var hasValidRecipeForPlayerObject = player.HasKitchenObject && HasValidRecipeFor(player.GetKitchenObject().KitchenObjectSO);
 
-        if (HasKitchenObject && (!player.HasKitchenObject || hasValidRecipeForPlayerObject))
+        if (HasKitchenObject)
         {
-            player.PickUpKitchenObject(GetKitchenObject());
+            if (player.HasKitchenObject && player.GetKitchenObject().TryGetPlate(out var plate))
+            {
+                var kitchenObject = GetKitchenObject();
+
+                if (plate.TryAddIngredient(kitchenObject.KitchenObjectSO))
+                {
+                    kitchenObject.DestroySelf();
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else if (!player.HasKitchenObject || hasValidRecipeForPlayerObject)
+            {
+                player.PickUpKitchenObject(GetKitchenObject());
+            }
         }
         else if (hasValidRecipeForPlayerObject)
         {
