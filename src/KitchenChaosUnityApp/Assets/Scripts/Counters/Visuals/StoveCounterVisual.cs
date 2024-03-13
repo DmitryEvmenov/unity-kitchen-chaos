@@ -17,7 +17,7 @@ public class StoveCounterVisual : MonoBehaviour
     {
         switch (e.cookingState)
         {
-            case StoveCounter.CookingState.NoCooking:
+            case StoveCounter.CookingState.Idle:
                 Hide();
                 break;
             case StoveCounter.CookingState.Cooking:

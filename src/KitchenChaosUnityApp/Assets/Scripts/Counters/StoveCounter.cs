@@ -13,7 +13,7 @@ public class StoveCounter : BaseCounter, IHasProgress
 
     public enum CookingState
     {
-        NoCooking,
+        Idle,
         Cooking,
         Burning,
         Spoiled,
@@ -119,7 +119,7 @@ public class StoveCounter : BaseCounter, IHasProgress
 
         switch (cookingState)
         {
-            case CookingState.NoCooking:
+            case CookingState.Idle:
                 var hasCookingRecipe = HasValidCookingRecipeFor(kitchenObjectSO);
 
                 cookingState = hasCookingRecipe
@@ -129,7 +129,7 @@ public class StoveCounter : BaseCounter, IHasProgress
             case CookingState.Cooking:
             case CookingState.Burning:
             case CookingState.Spoiled:
-                cookingState = CookingState.NoCooking;
+                cookingState = CookingState.Idle;
                 break;
         }
 
@@ -155,7 +155,7 @@ public class StoveCounter : BaseCounter, IHasProgress
     private void ResetCookingProgress()
     {
         cookingProgressTimer = 0;
-        cookingState = CookingState.NoCooking;
+        cookingState = CookingState.Idle;
         NotifyUpdateCookingProgress();
         NotifyCookingStateChanged();
     }
