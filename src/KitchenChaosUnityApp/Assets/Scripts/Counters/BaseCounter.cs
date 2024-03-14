@@ -9,6 +9,8 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
     private KitchenObject kitchenObject;
 
+    public static event EventHandler OnAnyObjectPlaced;
+
     public virtual void Interact(Player player) => TryInteract(player, OnInteract);
 
     protected abstract void OnInteract(Player player);
@@ -33,7 +35,15 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
     public KitchenObject GetKitchenObject() => kitchenObject;
 
-    public void SetKitchenObject(KitchenObject value) => kitchenObject = value;
+    public void SetKitchenObject(KitchenObject value)
+    {
+        kitchenObject = value;
+
+        if (HasKitchenObject)
+        {
+            OnAnyObjectPlaced?.Invoke(this, EventArgs.Empty);
+        }
+    }
 
     public bool HasKitchenObject => kitchenObject != null;
 

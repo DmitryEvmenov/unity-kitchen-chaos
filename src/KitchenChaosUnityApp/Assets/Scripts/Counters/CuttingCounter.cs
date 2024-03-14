@@ -14,6 +14,8 @@ public class CuttingCounter : BaseCounter, IHasProgress
 
     public event EventHandler OnCut;
 
+    public static event EventHandler OnAnyCut;
+
     protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
 
     private void HandlePickUpPutDownInteraction(Player player)
@@ -69,6 +71,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
 
         NotifyUpdateCuttingProgress(recipeSO.cuttingProgressMax);
         OnCut?.Invoke(this, EventArgs.Empty);
+        OnAnyCut?.Invoke(this, EventArgs.Empty);
 
         if (cuttingProgress >= recipeSO.cuttingProgressMax)
         {

@@ -21,6 +21,8 @@ public class DeliveryManager : MonoBehaviour
 
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
+    public event EventHandler OnDeliverySuccess;
+    public event EventHandler OnDeliveryFailure;
 
     private void Awake()
     {
@@ -67,7 +69,21 @@ public class DeliveryManager : MonoBehaviour
             }
         }
 
+        NotifyDeliveryResult(found);
+
         return found;
+    }
+
+    private void NotifyDeliveryResult(bool success)
+    {
+        if (success)
+        {
+            OnDeliverySuccess?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            OnDeliveryFailure?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static bool AreEqual<T>(List<T> first, List<T> second)
