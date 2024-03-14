@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ public class DeliveryManager : MonoBehaviour
 
     [SerializeField] private RecipeListSO recipeListSO;
 
+    public event EventHandler OnRecipeSpawned;
+    public event EventHandler OnRecipeCompleted;
+
     private void Awake()
     {
         waitingRecipeSOList = new List<RecipeSO>();
@@ -37,11 +41,11 @@ public class DeliveryManager : MonoBehaviour
         {
             spawnRecipeTimer = spawnRecipeTimerMaxSeconds;
 
-            var waitingRecipeSO = recipeListSO.recipeSOList[Random.Range(0, recipeListSO.recipeSOList.Count)];
+            var waitingRecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
 
             waitingRecipeSOList.Add(waitingRecipeSO);
 
-            Debug.Log(waitingRecipeSO.name);
+            OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -57,17 +61,10 @@ public class DeliveryManager : MonoBehaviour
             if (found)
             {
                 waitingRecipeSOList.Remove(waitingRecipe);
+                OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+
                 break;
             }
-        }
-
-        if (found)
-        {
-            Debug.Log("Correct order delivered!");
-        }
-        else
-        {
-            Debug.Log("No matching recipe order found :(");
         }
 
         return found;
@@ -80,4 +77,6 @@ public class DeliveryManager : MonoBehaviour
 
         return !firstNotSecond.Any() && !secondNotFirst.Any();
     }
+
+    public List<RecipeSO> GetWaitingRecipeSOList() => waitingRecipeSOList;
 }
