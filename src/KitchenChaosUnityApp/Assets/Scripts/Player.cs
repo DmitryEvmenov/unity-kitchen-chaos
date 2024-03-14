@@ -25,6 +25,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         public BaseCounter selectedCounter;
     }
 
+    public event EventHandler OnPickUp;
+
     public static Player Instance { get; private set; }
 
     private void Awake()
@@ -158,7 +160,15 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public KitchenObject GetKitchenObject() => kitchenObject;
 
-    public void SetKitchenObject(KitchenObject value) => kitchenObject = value;
+    public void SetKitchenObject(KitchenObject value)
+    {
+        kitchenObject = value;
+
+        if (HasKitchenObject)
+        {
+            OnPickUp?.Invoke(this, EventArgs.Empty);
+        }
+    }
 
     public bool HasKitchenObject => kitchenObject != null;
 

@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class DeliveryCounter : BaseCounter
 {
+    public static DeliveryCounter Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     protected override void OnInteract(Player player)
     {
         player.GetKitchenObject().TryGetPlate(out var plate);
