@@ -16,6 +16,11 @@ public class CuttingCounter : BaseCounter, IHasProgress
 
     public static event EventHandler OnAnyCut;
 
+    public static new void ResetStaticData()
+    {
+        OnAnyCut = null;
+    }
+
     protected override void OnInteract(Player player) => HandlePickUpPutDownInteraction(player);
 
     private void HandlePickUpPutDownInteraction(Player player)

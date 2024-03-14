@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -17,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     private State state;
 
+    private bool isGamePaused = false;
+
     [SerializeField] private float waitingToStartTimer;
     [SerializeField] private float countDownToStartTimer;
     [SerializeField] private float gamePlayingTimer;
@@ -30,12 +33,22 @@ public class GameManager : MonoBehaviour
         public State NewState { get; set; }
     }
 
+    public event EventHandler OnGamePaused;
+    public event EventHandler OnGameUnpaused;
+
     private void Awake()
     {
         state = State.WaitingToStart;
         gamePlayingTimerMax = gamePlayingTimer;
         Instance = this;
     }
+
+    private void Start()
+    {
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+    }
+
+    private void GameInput_OnPauseAction(object sender, EventArgs e) => TogglePauseGame();
 
     private void Update()
     {
@@ -73,4 +86,20 @@ public class GameManager : MonoBehaviour
     public float GetCountdownToStartTimer() => countDownToStartTimer;
 
     public float GetGamePlayingTimerNormalized() => 1 - gamePlayingTimer / gamePlayingTimerMax;
+
+    public void TogglePauseGame()
+    {
+        isGamePaused = !isGamePaused;
+
+        if (isGamePaused)
+        {
+            Time.timeScale = 0;
+            OnGamePaused?.Invoke(this, EventArgs.Empty);
+        }
+        else 
+        {
+            Time.timeScale = 1;
+            OnGameUnpaused?.Invoke(this, EventArgs.Empty);
+        }
+    }
 }
