@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float countDownToStartTimer;
     [SerializeField] private float gamePlayingTimer;
 
+    private float gamePlayingTimerMax;
+
     public event EventHandler<OnGameStateChangedEventArgs> OnGameStateChanged;
 
     public class OnGameStateChangedEventArgs : EventArgs
@@ -31,6 +33,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         state = State.WaitingToStart;
+        gamePlayingTimerMax = gamePlayingTimer;
         Instance = this;
     }
 
@@ -68,4 +71,6 @@ public class GameManager : MonoBehaviour
     public bool IsCountdownToStart() => state == State.CountdownToStart;
 
     public float GetCountdownToStartTimer() => countDownToStartTimer;
+
+    public float GetGamePlayingTimerNormalized() => 1 - gamePlayingTimer / gamePlayingTimerMax;
 }
