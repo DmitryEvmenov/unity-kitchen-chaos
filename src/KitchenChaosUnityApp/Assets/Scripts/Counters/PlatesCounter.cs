@@ -22,9 +22,9 @@ public class PlatesCounter : BaseCounter
             return;
         }
 
-        spawnPlateTimer += Time.deltaTime;
+        spawnPlateTimer -= Time.deltaTime;
 
-        if (spawnPlateTimer >= spawnPlateTimerMax)
+        if (spawnPlateTimer <= 0f)
         {
             HandleSpawnVisualPlate();
         }
@@ -32,7 +32,7 @@ public class PlatesCounter : BaseCounter
 
     private void HandleSpawnVisualPlate()
     {
-        spawnPlateTimer = 0;
+        spawnPlateTimer = spawnPlateTimerMax;
 
         if (platesSpawnedAmount < platesSpawnAmountMax)
         {

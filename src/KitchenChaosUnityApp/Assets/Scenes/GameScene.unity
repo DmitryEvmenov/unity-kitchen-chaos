@@ -2262,6 +2262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   container: {fileID: 596689896}
   recipeTemplate: {fileID: 774316565}
+  titleText: {fileID: 461660573}
 --- !u!1001 &407118971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7762,7 +7763,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   countDownToStartTimer: 5
-  gamePlayingTimer: 30
+  gamePlayingTimer: 300
 --- !u!4 &1251283849
 Transform:
   m_ObjectHideFlags: 0
@@ -13182,7 +13183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39282b561479f5e4a8b9355fb7434c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnRecipeTimerMaxSeconds: 5
+  spawnRecipeTimerMaxSeconds: 15
   waitingRecipeListMax: 4
   recipeListSO: {fileID: 11400000, guid: 2cfb10a8b9fd8704fa8f0bf45f67447e, type: 2}
 --- !u!4 &1934797048
