@@ -35,7 +35,7 @@ public class DeliveryManager : MonoBehaviour
 
     private void Update()
     {
-        if (waitingRecipeSOList.Count >= waitingRecipeListMax)
+        if (!GameManager.Instance.IsGamePlaying() || waitingRecipeSOList.Count >= waitingRecipeListMax)
         {
             return;
         }

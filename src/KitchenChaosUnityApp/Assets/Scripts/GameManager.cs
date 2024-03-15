@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
 
     private bool isGamePaused = false;
 
-    [SerializeField] private float waitingToStartTimer;
     [SerializeField] private float countDownToStartTimer;
     [SerializeField] private float gamePlayingTimer;
 
@@ -46,6 +45,16 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    private void GameInput_OnInteractAction(object sender, EventArgs e)
+    {
+        if (state == State.WaitingToStart)
+        {
+            state = State.CountdownToStart;
+            OnGameStateChanged?.Invoke(this, new OnGameStateChangedEventArgs { NewState = state });
+        }
     }
 
     private void GameInput_OnPauseAction(object sender, EventArgs e) => TogglePauseGame();
@@ -54,16 +63,13 @@ public class GameManager : MonoBehaviour
     {
         switch (state)
         {
-            case State.WaitingToStart:
-                SwitchNextStateIfReady(State.CountdownToStart, ref waitingToStartTimer);
-                break;
             case State.CountdownToStart:
                 SwitchNextStateIfReady(State.GamePlaying, ref countDownToStartTimer);
                 break;
             case State.GamePlaying:
                 SwitchNextStateIfReady(State.GameOver, ref gamePlayingTimer);
                 break;
-            case State.GameOver:
+            default:
                 break;
         }
     }

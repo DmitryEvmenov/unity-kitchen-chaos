@@ -8,9 +8,15 @@ public class StoveCounterSound : MonoBehaviour
 
     [SerializeField] private StoveCounter stoveCounter;
 
+    [SerializeField] private float warningSoundTimerMax = .2f;
+
+    private bool playWarningSound = false;
+    private float warningSoundTimer;
+
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        warningSoundTimer = warningSoundTimerMax;
     }
 
     private void Start()
@@ -29,6 +35,24 @@ public class StoveCounterSound : MonoBehaviour
         else
         {
             audioSource.Pause();
+        }
+
+        playWarningSound = e.cookingState == StoveCounter.CookingState.Burning;
+    }
+
+    private void Update()
+    {
+        if (!playWarningSound)
+        {
+            return;
+        }
+
+        warningSoundTimer -= Time.deltaTime;
+        if (warningSoundTimer <= 0)
+        {
+            warningSoundTimer = warningSoundTimerMax;
+
+            SoundManager.Instance.PlayWarningSound(stoveCounter.transform.position);
         }
     }
 }
