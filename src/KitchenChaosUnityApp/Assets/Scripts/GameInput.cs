@@ -22,7 +22,10 @@ public class GameInput : MonoBehaviour
         MoveRight,
         Interact,
         InteractAlternate,
-        Pause
+        Pause,
+        Gamepad_Interact,
+        Gamepad_InteractAlternate,
+        Gamepad_Pause
     }
 
     private void Awake()
@@ -82,6 +85,9 @@ public class GameInput : MonoBehaviour
             Binding.Interact => (_actions.Player.Interact, 0),
             Binding.InteractAlternate => (_actions.Player.InteractAlternate, 0),
             Binding.Pause => (_actions.Player.Pause, 0),
+            Binding.Gamepad_Interact => (_actions.Player.Interact, 1),
+            Binding.Gamepad_InteractAlternate => (_actions.Player.InteractAlternate, 1),
+            Binding.Gamepad_Pause => (_actions.Player.Pause, 1),
             _ => throw new ArgumentOutOfRangeException("Unsupported binding detected")
         };
 

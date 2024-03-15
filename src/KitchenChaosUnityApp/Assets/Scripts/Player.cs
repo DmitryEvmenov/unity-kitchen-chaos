@@ -6,6 +6,7 @@ using UnityEngine;
 public class Player : MonoBehaviour, IKitchenObjectParent
 {
     [SerializeField] private float moveSpeed = 7f;
+    [SerializeField] private float moveMinReactDelta = .5f;
     [SerializeField] private float rotateSpeed = 10f;
     [SerializeField] private GameInput gameInput;
     [SerializeField] private float playerHeight = 2f;
@@ -96,7 +97,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         {
             var moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
 
-            if (CanMove(moveDirX))
+            if (IsLegitMove(moveDir.x) && CanMove(moveDirX))
             {
                 Move(moveDirX);
             }
@@ -104,7 +105,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             {
                 var moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
 
-                if (CanMove(moveDirZ))
+                if (IsLegitMove(moveDir.z) && CanMove(moveDirZ))
                 {
                     Move(moveDirZ);
                 }
@@ -161,6 +162,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private bool CanMove(Vector3 moveDir) => 
         !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, MoveDistance);
+
+    private bool IsLegitMove(float moveVector) => moveVector > moveMinReactDelta || moveVector < -moveMinReactDelta;
 
     private void Move(Vector3 moveDir) => transform.position += MoveDistance * moveDir;
 
