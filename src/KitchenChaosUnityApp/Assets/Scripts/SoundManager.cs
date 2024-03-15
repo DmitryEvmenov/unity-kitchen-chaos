@@ -10,11 +10,17 @@ public class SoundManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        defaultSoundEffectsVolume = PlayerPrefs.GetFloat(PLAYER_PREFS_SOUND_EFFECTS_VOLUME, defaultSoundEffectsVolume);
     }
 
     [SerializeField] private AudioClipRefsSO audioClipRefsSO;
 
-    [SerializeField] private float defaultVolume;
+    [SerializeField] private float defaultSoundEffectsVolume;
+
+    [SerializeField] private float volumeIncreaseIncrement;
+
+    private const string PLAYER_PREFS_SOUND_EFFECTS_VOLUME = "SoundEffectsVolume";
 
     private void Start()
     {
@@ -45,11 +51,28 @@ public class SoundManager : MonoBehaviour
         PlayRandomFromArraySound(audioClipRefsSO.deliverySuccess, DeliveryCounter.Instance.transform.position);
 
     private void PlaySound(AudioClip audioClip, Vector3? position = null, float? volume = null) => 
-        AudioSource.PlayClipAtPoint(audioClip, position ?? Camera.main.transform.position, volume ?? defaultVolume);
+        AudioSource.PlayClipAtPoint(audioClip, position ?? Camera.main.transform.position, volume ?? defaultSoundEffectsVolume);
 
     private void PlayRandomFromArraySound(AudioClip[] audioClipsArray, Vector3? position = null, float? volume = null) =>
         PlaySound(audioClipsArray[Random.Range(0, audioClipsArray.Length)], position, volume);
 
     public void PlayFootstepsSound(Vector3 position) =>
         PlayRandomFromArraySound(audioClipRefsSO.footstep, position);
+
+    public void ChangeSoundEffectsVolume() => ToggleIncreaseVolume(ref defaultSoundEffectsVolume);
+
+    private void ToggleIncreaseVolume(ref float volume)
+    {
+        volume += volumeIncreaseIncrement;
+
+        if (volume > 1)
+        {
+            volume = 0;
+        }
+
+        PlayerPrefs.SetFloat(PLAYER_PREFS_SOUND_EFFECTS_VOLUME, volume);
+        PlayerPrefs.Save();
+    }
+
+    public float GetSoundEffectsVolume() => defaultSoundEffectsVolume;
 }
