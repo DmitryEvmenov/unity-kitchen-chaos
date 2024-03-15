@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   counterTopPoint: {fileID: 7366917593348148666}
-  spawnPlateTimerMax: 4
+  spawnPlateTimerMax: 20
   platesSpawnAmountMax: 4
   plateKichenObjectSO: {fileID: 11400000, guid: 4397c8820ca7b6d42b4b36264913eb20,
     type: 2}

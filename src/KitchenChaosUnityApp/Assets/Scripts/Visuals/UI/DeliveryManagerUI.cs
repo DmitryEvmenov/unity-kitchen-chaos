@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class DeliveryManagerUI : MonoBehaviour
 {
     [SerializeField] private Transform container;
     [SerializeField] private Transform recipeTemplate;
+    [SerializeField] private TextMeshProUGUI titleText;
 
     private void Awake()
     {
@@ -18,6 +21,7 @@ public class DeliveryManagerUI : MonoBehaviour
         DeliveryManager.Instance.OnRecipeCompleted += DeliveryManager_OnRecipeCompleted;
 
         UpdateVisual();
+        titleText.gameObject.SetActive(false);
     }
 
     private void DeliveryManager_OnRecipeCompleted(object sender, System.EventArgs e) => UpdateVisual();
@@ -35,11 +39,18 @@ public class DeliveryManagerUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach(var recipeSO in DeliveryManager.Instance.GetWaitingRecipeSOList())
+        var recipeWaitingList = DeliveryManager.Instance.GetWaitingRecipeSOList();
+
+        foreach (var recipeSO in recipeWaitingList)
         {
             var recipeTransform = Instantiate(recipeTemplate, container);
             recipeTransform.gameObject.SetActive(true);
             recipeTransform.GetComponent<DeliveryManagerSingleUI>().SetRecipeSO(recipeSO);
+        }
+
+        if (recipeWaitingList.Any())
+        {
+            titleText.gameObject.SetActive(true);
         }
     }
 }

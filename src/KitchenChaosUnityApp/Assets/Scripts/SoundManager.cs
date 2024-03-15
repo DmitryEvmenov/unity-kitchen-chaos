@@ -75,4 +75,10 @@ public class SoundManager : MonoBehaviour
     }
 
     public float GetSoundEffectsVolume() => defaultSoundEffectsVolume;
+
+    public void PlayCountdownSound() =>
+        PlayRandomFromArraySound(audioClipRefsSO.warning, Vector3.zero);
+
+    public void PlayWarningSound(Vector3? position) =>
+        PlayRandomFromArraySound(audioClipRefsSO.warning, position);
 }
