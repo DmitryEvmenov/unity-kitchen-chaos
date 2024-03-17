@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float moveMinReactDelta = .5f;
@@ -26,24 +27,30 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         public BaseCounter selectedCounter;
     }
 
-    public event EventHandler OnPickUp;
+    public static event EventHandler OnAnyPlayerSpawned;
+    public static event EventHandler OnAnyPlayerPickUp;
 
-    public static Player Instance { get; private set; }
-
-    private void Awake()
+    public static void ResetStaticData()
     {
-        if (Instance != null) 
-        {
-            Debug.Log("Another player instance found");
-        }
-
-        Instance = this;
+        OnAnyPlayerSpawned = null;
     }
+
+    public static Player LocalInstance { get; private set; }
 
     private void Start()
     {
-        gameInput.OnInteractAction += GameInput_OnInteractAction;
-        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+        GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            LocalInstance = this;
+        }
+
+        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -74,6 +81,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+
         HandleMovement();
 
         if (GameManager.Instance.IsGamePlaying())
@@ -159,7 +171,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private Vector3 GetCurrentMovementVector()
     {
-        var inputVector = gameInput.GetMovementVectorNormalized();
+        var inputVector = GameInput.Instance.GetMovementVectorNormalized();
 
         return new Vector3(inputVector.x, 0f, inputVector.y);
     }
@@ -183,7 +195,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         if (HasKitchenObject)
         {
-            OnPickUp?.Invoke(this, EventArgs.Empty);
+            OnAnyPlayerPickUp?.Invoke(this, EventArgs.Empty);
         }
     }
 

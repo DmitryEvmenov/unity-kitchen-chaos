@@ -46,15 +46,23 @@ public class GameManager : MonoBehaviour
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+
+        // debug trigger game start automatically
+        SwitchToCountdown();
     }
 
     private void GameInput_OnInteractAction(object sender, EventArgs e)
     {
         if (state == State.WaitingToStart)
         {
-            state = State.CountdownToStart;
-            OnGameStateChanged?.Invoke(this, new OnGameStateChangedEventArgs { NewState = state });
+            SwitchToCountdown();
         }
+    }
+
+    private void SwitchToCountdown()
+    {
+        state = State.CountdownToStart;
+        OnGameStateChanged?.Invoke(this, new OnGameStateChangedEventArgs { NewState = state });
     }
 
     private void GameInput_OnPauseAction(object sender, EventArgs e) => TogglePauseGame();
