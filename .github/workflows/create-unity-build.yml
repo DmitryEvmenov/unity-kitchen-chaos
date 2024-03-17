@@ -1,4 +1,4 @@
-name: Build Unity app for WebGL and publish as an artifcat for further deployments
+name: Build Unity app and publish as an artifcat for further deployments
 
 env:
   SOURCE_LOCATION: './src/KitchenChaosUnityApp'
@@ -53,7 +53,7 @@ jobs:
             Library-
             
       - name: Build project
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
