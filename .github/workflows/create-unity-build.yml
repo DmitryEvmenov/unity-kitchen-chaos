@@ -1,0 +1,71 @@
+name: Build Unity app for WebGL and publish as an artifcat for further deployments
+
+env:
+  SOURCE_LOCATION: './src/KitchenChaosUnityApp'
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     './src/EdufyUnityApp/**'
+  workflow_dispatch:
+    inputs:
+      targetPlatform:
+        description: 'The Unity target build platform'
+        required: true
+        type: choice
+        options:
+          - StandaloneOSX
+          - StandaloneWindows
+          - iOS
+          - Android
+          - StandaloneWindows64
+          - WebGL
+          - WSAPlayer
+          - StandaloneLinux64
+          - PS4
+          - XboxOne
+          - tvOS
+          - Switch
+          - Stadia
+          - LinuxHeadlessSimulation
+          - PS5
+          - VisionOS
+        default: StandaloneWindows64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+  
+      - name: Cache Unity resources
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.SOURCE_LOCATION }}/Library
+          key: Library-${{ hashFiles('${{ env.SOURCE_LOCATION }}/Assets/**', '${{ env.SOURCE_LOCATION }}/Packages/**', '${{ env.SOURCE_LOCATION }}/ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+            
+      - name: Build project
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ inputs.targetPlatform }} 
+          projectPath: ${{ env.SOURCE_LOCATION }}
+          allowDirtyBuild: true
+  
+      - name: Publish build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build-${{ inputs.targetPlatform }} 
+          path: build-${{ inputs.targetPlatform }} 
+          if-no-files-found: error
