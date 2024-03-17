@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float moveMinReactDelta = .5f;
@@ -28,22 +29,17 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public event EventHandler OnPickUp;
 
-    public static Player Instance { get; private set; }
+    //public static Player Instance { get; private set; }
 
     private void Awake()
     {
-        if (Instance != null) 
-        {
-            Debug.Log("Another player instance found");
-        }
-
-        Instance = this;
+        //Instance = this;
     }
 
     private void Start()
     {
-        gameInput.OnInteractAction += GameInput_OnInteractAction;
-        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+        GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -159,7 +155,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private Vector3 GetCurrentMovementVector()
     {
-        var inputVector = gameInput.GetMovementVectorNormalized();
+        var inputVector = GameInput.Instance.GetMovementVectorNormalized();
 
         return new Vector3(inputVector.x, 0f, inputVector.y);
     }
