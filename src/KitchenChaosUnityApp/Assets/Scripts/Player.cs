@@ -27,19 +27,30 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         public BaseCounter selectedCounter;
     }
 
-    public event EventHandler OnPickUp;
+    public static event EventHandler OnAnyPlayerSpawned;
+    public static event EventHandler OnAnyPlayerPickUp;
 
-    //public static Player Instance { get; private set; }
-
-    private void Awake()
+    public static void ResetStaticData()
     {
-        //Instance = this;
+        OnAnyPlayerSpawned = null;
     }
+
+    public static Player LocalInstance { get; private set; }
 
     private void Start()
     {
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            LocalInstance = this;
+        }
+
+        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
@@ -184,7 +195,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
 
         if (HasKitchenObject)
         {
-            OnPickUp?.Invoke(this, EventArgs.Empty);
+            OnAnyPlayerPickUp?.Invoke(this, EventArgs.Empty);
         }
     }
 
