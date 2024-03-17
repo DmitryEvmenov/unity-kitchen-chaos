@@ -70,6 +70,11 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
 
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+
         HandleMovement();
 
         if (GameManager.Instance.IsGamePlaying())

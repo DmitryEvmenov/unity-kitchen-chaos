@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 8806021025383889077}
   - component: {fileID: -486985217297952310}
   - component: {fileID: 1248616772058144018}
+  - component: {fileID: -5532897023485150852}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -109,6 +110,37 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   kitchenObjectHoldPoint: {fileID: 3014594583727210079}
+--- !u!114 &-5532897023485150852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6382416244676415136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f92aa9c5ec076ab4192044a3731414ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 0
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1001 &2731223742247558930
 PrefabInstance:
   m_ObjectHideFlags: 0
