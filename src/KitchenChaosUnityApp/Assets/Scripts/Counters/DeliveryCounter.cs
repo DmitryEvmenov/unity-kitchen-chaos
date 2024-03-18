@@ -19,7 +19,7 @@ public class DeliveryCounter : BaseCounter
 
         if (delivered)
         {
-            player.GetKitchenObject().DestroySelf();
+            KitchenObject.Destroy(player.GetKitchenObject());
         }
     }
 
