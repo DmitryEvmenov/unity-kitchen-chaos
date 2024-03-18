@@ -11,7 +11,7 @@ public class KitchenObject : NetworkBehaviour
 
     private FollowTransform followTransform;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         followTransform = GetComponent<FollowTransform>();
     }
