@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class KitchenObject : MonoBehaviour
+public class KitchenObject : NetworkBehaviour
 {
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
@@ -46,8 +47,8 @@ public class KitchenObject : MonoBehaviour
 
     private void FixUpTransformPosition()
     {
-        transform.parent = currentKitchenObjectParent.KitchenObjectFollowTransform;
-        transform.localPosition = Vector3.zero;
+        //transform.parent = currentKitchenObjectParent.KitchenObjectFollowTransform;
+        //transform.localPosition = Vector3.zero;
     }
 
     public KitchenObjectSO KitchenObjectSO => kitchenObjectSO;
@@ -58,17 +59,8 @@ public class KitchenObject : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public static KitchenObject Spawn(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent = null)
-    {
-        var spawnedObject = Instantiate(kitchenObjectSO.prefab).GetComponent<KitchenObject>();
-
-        if (kitchenObjectParent != null)
-        {
-            spawnedObject.SetParentKitchenObject(kitchenObjectParent);
-        }
-
-        return spawnedObject;
-    }
+    public static void Spawn(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent) =>
+        GameMultiplayer.Instance.SpawnKitchenObject(kitchenObjectSO, kitchenObjectParent);
 
     public bool TryGetPlate(out PlateKitchenObject plateKitchenObject)
     {

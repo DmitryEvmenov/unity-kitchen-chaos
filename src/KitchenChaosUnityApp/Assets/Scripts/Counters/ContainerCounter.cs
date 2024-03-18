@@ -13,9 +13,7 @@ public class ContainerCounter : BaseCounter
 
     private void HandleSpawnNewPickUpInteraction(Player player)
     {
-        var newSpawnedObject = KitchenObject.Spawn(kitchenObjectSO);
-
-        player.PickUpKitchenObject(newSpawnedObject);
+        KitchenObject.Spawn(kitchenObjectSO, player);
 
         OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
     }

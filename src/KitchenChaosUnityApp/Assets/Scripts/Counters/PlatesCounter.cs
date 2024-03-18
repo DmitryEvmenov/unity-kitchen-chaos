@@ -48,8 +48,7 @@ public class PlatesCounter : BaseCounter
 
     private void HandlePickUpPlateInteraction(Player player)
     {
-        var newPlate = KitchenObject.Spawn(plateKichenObjectSO);
-        player.PickUpKitchenObject(newPlate);
+        KitchenObject.Spawn(plateKichenObjectSO, player);
 
         platesSpawnedAmount--;
         OnPlateRemoved?.Invoke(this, EventArgs.Empty);
