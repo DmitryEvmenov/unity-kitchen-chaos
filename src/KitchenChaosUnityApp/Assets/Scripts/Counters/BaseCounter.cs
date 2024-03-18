@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
+public abstract class BaseCounter : NetworkBehaviour, IKitchenObjectParent
 {
     [SerializeField] private Transform counterTopPoint;
 
@@ -56,6 +56,4 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
     public void ClearKitchenObject() => kitchenObject = null;
 
     public virtual bool CanInteract(Player player) => true;
-
-    public NetworkObject NetworkObject => null;
 }

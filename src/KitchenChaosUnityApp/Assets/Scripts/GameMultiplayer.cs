@@ -33,5 +33,4 @@ public class GameMultiplayer : NetworkBehaviour
         var parent = kitchenObjectParentNetworkObject.GetComponent<IKitchenObjectParent>();
         kitchenObject.SetParentKitchenObject(parent);
     }
-
 }
