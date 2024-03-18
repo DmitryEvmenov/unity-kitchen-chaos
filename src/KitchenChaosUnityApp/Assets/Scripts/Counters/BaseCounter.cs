@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
+public abstract class BaseCounter : NetworkBehaviour, IKitchenObjectParent
 {
     [SerializeField] private Transform counterTopPoint;
 
