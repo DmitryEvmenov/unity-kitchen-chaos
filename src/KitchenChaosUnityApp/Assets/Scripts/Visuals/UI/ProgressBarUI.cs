@@ -7,15 +7,23 @@ using UnityEngine.UI;
 public class OnProgressChangedEventArgs : EventArgs
 {
     public float progressNormalized;
-    public Color? progressColor;
+    public ProgressState progressState;
 }
+
+public enum ProgressState
+{
+    Regular,
+    Warning
+}
+
 
 public class ProgressBarUI : MonoBehaviour
 {
     [SerializeField] private Image barImage;
-    [SerializeField] private Color defaultColor;
+    [SerializeField] private Color regularStateColor;
     // todo: this is a workaround solution to let pass interface type as serializedField
     [SerializeField] GameObject progressibleCounterGameObject;
+    [SerializeField] private Color warningStateColor;
     private IHasProgress progressibleCounter => progressibleCounterGameObject.GetComponent<IHasProgress>();
 
     private void Start()
@@ -23,7 +31,7 @@ public class ProgressBarUI : MonoBehaviour
         progressibleCounter.OnProgressChanged += ProgressibleCounter_OnProgressChanged;
 
         barImage.fillAmount = 0f;
-        barImage.color = defaultColor;
+        barImage.color = regularStateColor;
 
         Hide();
     }
@@ -31,7 +39,7 @@ public class ProgressBarUI : MonoBehaviour
     private void ProgressibleCounter_OnProgressChanged(object sender, OnProgressChangedEventArgs e) 
     {
         barImage.fillAmount = e.progressNormalized;
-        barImage.color = e.progressColor.GetValueOrDefault(defaultColor);
+        barImage.color = e.progressState == ProgressState.Regular ? regularStateColor : warningStateColor;
 
         if (e.progressNormalized == 0f || e.progressNormalized == 1f)
         {

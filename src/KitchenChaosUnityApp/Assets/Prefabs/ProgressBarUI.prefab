@@ -193,8 +193,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   barImage: {fileID: 1323080705890676792}
-  defaultColor: {r: 0.6784314, g: 1, b: 0.18431373, a: 1}
+  regularStateColor: {r: 0.14538093, g: 0.9339623, b: 0.15866947, a: 1}
   progressibleCounterGameObject: {fileID: 0}
+  warningStateColor: {r: 0.9056604, g: 0.10679956, b: 0.10679956, a: 1}
 --- !u!114 &9130080603198747917
 MonoBehaviour:
   m_ObjectHideFlags: 0
