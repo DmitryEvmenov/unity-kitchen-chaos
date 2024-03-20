@@ -16,12 +16,12 @@ public class GameMultiplayer : NetworkBehaviour
     }
 
     public void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent) =>
-        SpawnKitchenObjectServerRpc(kitchenObjectListSO.KitchenObjectSOList.IndexOf(kitchenObjectSO), kitchenObjectParent.NetworkObject);
+        SpawnKitchenObjectServerRpc(GetKitcheObjectSOIndex(kitchenObjectSO), kitchenObjectParent.NetworkObject);
 
     [ServerRpc(RequireOwnership = false)]
     private void SpawnKitchenObjectServerRpc(int kitchenObjectSOIndex, NetworkObjectReference kitchenObjectParentNetworkObjectReference)
     {
-        var kitchenObjectSO = kitchenObjectListSO.KitchenObjectSOList[kitchenObjectSOIndex];
+        var kitchenObjectSO = GetKitchenObjectSOByIndex(kitchenObjectSOIndex);
 
         var transform = Instantiate(kitchenObjectSO.prefab);
         var networkObject = transform.GetComponent<NetworkObject>();
@@ -39,8 +39,7 @@ public class GameMultiplayer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void DestroyKitchenObjectServerRpc(NetworkObjectReference kitchenObjectNetworkObjectReference)
     {
-        kitchenObjectNetworkObjectReference.TryGet(out var kitchenObjectNetworkObject);
-        var kitchenObject = kitchenObjectNetworkObject.GetComponent<KitchenObject>();
+        var kitchenObject = TryGetKitchenObjectComponent(kitchenObjectNetworkObjectReference);
 
         ClearKitchenObjectOnParentClientRpc(kitchenObjectNetworkObjectReference);
 
@@ -50,9 +49,18 @@ public class GameMultiplayer : NetworkBehaviour
     [ClientRpc]
     private void ClearKitchenObjectOnParentClientRpc(NetworkObjectReference kitchenObjectNetworkObjectReference)
     {
-        kitchenObjectNetworkObjectReference.TryGet(out var kitchenObjectNetworkObject);
-        var kitchenObject = kitchenObjectNetworkObject.GetComponent<KitchenObject>();
+        var kitchenObject = TryGetKitchenObjectComponent(kitchenObjectNetworkObjectReference);
 
         kitchenObject.ClearKitchenObjectOnParent();
     }
+
+    private KitchenObject TryGetKitchenObjectComponent(NetworkObjectReference kitchenObjectNetworkObjectReference)
+    {
+        kitchenObjectNetworkObjectReference.TryGet(out var kitchenObjectNetworkObject);
+        return kitchenObjectNetworkObject.GetComponent<KitchenObject>();
+    }
+
+    public int GetKitcheObjectSOIndex(KitchenObjectSO kitchenObjectSO) => kitchenObjectListSO.KitchenObjectSOList.IndexOf(kitchenObjectSO);
+
+    public KitchenObjectSO GetKitchenObjectSOByIndex(int index) => kitchenObjectListSO.KitchenObjectSOList[index];
 }

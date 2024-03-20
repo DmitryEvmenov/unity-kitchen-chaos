@@ -9,11 +9,11 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float moveMinReactDelta = .5f;
     [SerializeField] private float rotateSpeed = 10f;
-    [SerializeField] private GameInput gameInput;
-    [SerializeField] private float playerHeight = 2f;
     [SerializeField] private float playerRadius = .7f;
     [SerializeField] private LayerMask counterLayerMask;
+    [SerializeField] private LayerMask collisionsLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
+    [SerializeField] private List<Vector3> spawnPositionList;
 
     private KitchenObject kitchenObject;
 
@@ -50,6 +50,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             LocalInstance = this;
         }
 
+        transform.position = spawnPositionList[(int)OwnerClientId];
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
 
@@ -177,7 +178,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     }
 
     private bool CanMove(Vector3 moveDir) => 
-        !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, MoveDistance);
+        !Physics.BoxCast(transform.position, Vector3.one * playerRadius, moveDir, Quaternion.identity, MoveDistance, collisionsLayerMask);
 
     private bool IsLegitMove(float moveVector) => moveVector > moveMinReactDelta || moveVector < -moveMinReactDelta;
 
