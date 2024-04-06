@@ -207,7 +207,5 @@ public class GameMultiplayer : NetworkBehaviour
     public void KickPlayer(ulong clientId)
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
-
-        //NetworkManager_Host_OnClientDisconnectCallback(clientId); //todo: verify whether called automatically on DisconnectClient
     }
 }
