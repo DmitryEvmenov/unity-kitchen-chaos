@@ -15,6 +15,31 @@ public class GameMultiplayer : NetworkBehaviour
         Instance = this;
     }
 
+    public void StartHost()
+    {
+        if (NetworkManager.Singleton.ConnectionApprovalCallback is null)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
+        }
+
+        NetworkManager.Singleton.StartHost();
+    }
+
+    private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        response.Approved = GameManager.Instance.IsWaitingToStart();
+
+        if (response.Approved)
+        {
+            response.CreatePlayerObject = true;
+        }
+    }
+
+    public void StartClient()
+    {
+        NetworkManager.Singleton.StartClient();
+    }
+
     public void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent) =>
         SpawnKitchenObjectServerRpc(GetKitcheObjectSOIndex(kitchenObjectSO), kitchenObjectParent.NetworkObject);
 

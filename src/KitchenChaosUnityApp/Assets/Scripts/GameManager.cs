@@ -179,6 +179,8 @@ public class GameManager : NetworkBehaviour
 
     public bool IsCountdownToStart() => state.Value == State.CountdownToStart;
 
+    public bool IsWaitingToStart() => state.Value == State.WaitingToStart;
+
     public float GetCountdownToStartTimer() => countDownToStartTimer.Value;
 
     public float GetGamePlayingTimerNormalized() => 1 - gamePlayingTimer.Value / gamePlayingTimerMax;
