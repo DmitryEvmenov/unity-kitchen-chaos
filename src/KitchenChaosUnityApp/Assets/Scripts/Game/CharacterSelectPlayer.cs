@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterSelectPlayer : MonoBehaviour
 {
@@ -8,12 +10,23 @@ public class CharacterSelectPlayer : MonoBehaviour
 
     [SerializeField] private GameObject readyGameObject;
     [SerializeField] private PlayerVisual playerVisual;
+    [SerializeField] private Button kickPlayerButton;
+
+    private void Awake()
+    {
+        kickPlayerButton.onClick.AddListener(() =>
+        {
+            var playerData = GameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(index);
+            GameMultiplayer.Instance.KickPlayer(playerData.ClientId);
+        });
+    }
 
     private void Start()
     {
         GameMultiplayer.Instance.OnPlayerDataNetworkListChanged += GameMultiplayer_OnPlayerDataNetworkListChanged;
         CharacterSelectReady.Instance.OnReadyChanged += CharacterSelectReady_OnReadyChanged;
 
+        kickPlayerButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
         UpdatePlayer();
     }
 
@@ -47,4 +60,9 @@ public class CharacterSelectPlayer : MonoBehaviour
     private void Show() => gameObject.SetActive(true);
 
     private void Hide() => gameObject.SetActive(false);
+
+    private void OnDestroy()
+    {
+        GameMultiplayer.Instance.OnPlayerDataNetworkListChanged -= GameMultiplayer_OnPlayerDataNetworkListChanged;
+    }
 }

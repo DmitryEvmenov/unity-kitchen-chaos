@@ -37,12 +37,18 @@ public class GameMultiplayer : NetworkBehaviour
     public void StartHost()
     {
         NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
-        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Host_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Host_OnClientDisconnectCallback;
 
         NetworkManager.Singleton.StartHost();
     }
 
-    private void NetworkManager_OnClientConnectedCallback(ulong clientId)
+    private void NetworkManager_Host_OnClientDisconnectCallback(ulong clientId)
+    {
+        playerDataNetworkList.RemoveAt(GetPlayerDataIndexFromClientId(clientId));
+    }
+
+    private void NetworkManager_Host_OnClientConnectedCallback(ulong clientId)
     {
         playerDataNetworkList.Add(new PlayerData { ClientId = clientId, ColorId = GetFirstAvailableColorId() });
     }
@@ -70,11 +76,11 @@ public class GameMultiplayer : NetworkBehaviour
     {
         OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
 
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
         NetworkManager.Singleton.StartClient();
     }
 
-    private void NetworkManager_OnClientDisconnectCallback(ulong obj)
+    private void NetworkManager_Client_OnClientDisconnectCallback(ulong obj)
     {
         OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
     }
@@ -196,5 +202,12 @@ public class GameMultiplayer : NetworkBehaviour
         }
 
         return -1;
+    }
+
+    public void KickPlayer(ulong clientId)
+    {
+        NetworkManager.Singleton.DisconnectClient(clientId);
+
+        //NetworkManager_Host_OnClientDisconnectCallback(clientId); //todo: verify whether called automatically on DisconnectClient
     }
 }
