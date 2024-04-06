@@ -3,17 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameMultiplayer : NetworkBehaviour
 {
     public static GameMultiplayer Instance { get; private set; }
 
     [SerializeField] private KitchenObjectListSO kitchenObjectListSO;
+    [SerializeField] private int maxPlayersCount;
 
     private void Awake()
     {
         Instance = this;
+
+        DontDestroyOnLoad(gameObject);
     }
+
+    public event EventHandler OnTryingToJoinGame;
+    public event EventHandler OnFailedToJoinGame;
 
     public void StartHost()
     {
@@ -27,17 +34,34 @@ public class GameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
-        response.Approved = GameManager.Instance.IsWaitingToStart();
-
-        if (response.Approved)
+        if (SceneManager.GetActiveScene().name != Loader.Scene.CharacterSelectScene.ToString())
         {
-            response.CreatePlayerObject = true;
+            response.Approved = false;
+            response.Reason = "Game has already started";
+            return;
         }
+
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count > maxPlayersCount - 1)
+        {
+            response.Approved = false;
+            response.Reason = $"The game only allows {maxPlayersCount} players maximum";
+            return;
+        }
+
+        response.Approved = true;
     }
 
     public void StartClient()
     {
+        OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         NetworkManager.Singleton.StartClient();
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong obj)
+    {
+        OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
     }
 
     public void SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent) =>

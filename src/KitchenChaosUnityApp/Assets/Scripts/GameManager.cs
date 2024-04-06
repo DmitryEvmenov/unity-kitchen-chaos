@@ -18,6 +18,8 @@ public class GameManager : NetworkBehaviour
         GameOver
     }
 
+    [SerializeField] private Transform playerPrefab;
+
     private NetworkVariable<State> state = new(State.WaitingToStart);
     private bool isLocalPlayerReady;
 
@@ -69,6 +71,16 @@ public class GameManager : NetworkBehaviour
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+        }
+    }
+
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            var playerTransform = Instantiate(playerPrefab);
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, destroyWithScene: true);
         }
     }
 
