@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HostDisconnectedUI : NetworkBehaviour
+public class HostDisconnectedUI : MonoBehaviour
 {
     [SerializeField] private Button playAgainButton;
 
@@ -26,7 +26,7 @@ public class HostDisconnectedUI : NetworkBehaviour
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        if (!IsServer)
+        if (!NetworkManager.Singleton.IsServer)
         {
             Show();
         }
@@ -35,4 +35,9 @@ public class HostDisconnectedUI : NetworkBehaviour
     private void Show() => gameObject.SetActive(true);
 
     private void Hide() => gameObject.SetActive(false);
+
+    private void OnDestroy()
+    {
+        NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
+    }
 }
