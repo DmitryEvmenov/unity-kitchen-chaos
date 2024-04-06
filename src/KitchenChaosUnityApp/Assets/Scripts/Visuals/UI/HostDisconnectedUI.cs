@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HostDisconnectedUI : MonoBehaviour
+public class HostDisconnectedUI : NetworkBehaviour
 {
     [SerializeField] private Button playAgainButton;
 
@@ -26,7 +26,7 @@ public class HostDisconnectedUI : MonoBehaviour
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        if (clientId == NetworkManager.ServerClientId) //todo: not working, cliendId received for the server is 1 for some reason
+        if (!IsServer)
         {
             Show();
         }
