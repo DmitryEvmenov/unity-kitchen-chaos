@@ -1919,6 +1919,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 255626333}
+  - component: {fileID: 255626335}
   - component: {fileID: 255626334}
   m_Layer: 5
   m_Name: HostDisconnectedUI
@@ -1962,6 +1963,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playAgainButton: {fileID: 1404621904}
+--- !u!114 &255626335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255626332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3937398587
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &291954832
 GameObject:
   m_ObjectHideFlags: 0

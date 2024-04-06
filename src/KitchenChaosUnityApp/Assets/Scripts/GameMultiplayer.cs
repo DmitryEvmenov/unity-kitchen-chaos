@@ -24,10 +24,7 @@ public class GameMultiplayer : NetworkBehaviour
 
     public void StartHost()
     {
-        if (NetworkManager.Singleton.ConnectionApprovalCallback is null)
-        {
-            NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
-        }
+        NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
 
         NetworkManager.Singleton.StartHost();
     }

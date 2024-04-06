@@ -24,7 +24,9 @@ public class ConnectionResponseMessageUI : MonoBehaviour
 
     private void GameMultiplayer_OnFailedToJoinGame(object sender, System.EventArgs e)
     {
-        messageText.text = NetworkManager.Singleton.DisconnectReason;
+        messageText.text = !string.IsNullOrEmpty(NetworkManager.Singleton.DisconnectReason)
+            ? NetworkManager.Singleton.DisconnectReason
+            : "Failed to connect.";
 
         Show();
     }
