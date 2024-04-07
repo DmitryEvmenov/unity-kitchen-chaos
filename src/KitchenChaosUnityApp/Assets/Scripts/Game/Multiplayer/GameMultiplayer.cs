@@ -208,4 +208,6 @@ public class GameMultiplayer : NetworkBehaviour
     {
         NetworkManager.Singleton.DisconnectClient(clientId);
     }
+
+    public int GetMaxPlayersCount() => maxPlayersCount;
 }
