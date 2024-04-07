@@ -7,14 +7,16 @@ public class MainMenuCleanUp : MonoBehaviour
 {
     private void Awake()
     {
-        if (NetworkManager.Singleton != null)
-        {
-            Destroy(NetworkManager.Singleton.gameObject);
-        }
+        DestroyIfExists(NetworkManager.Singleton);
+        DestroyIfExists(GameMultiplayer.Instance);
+        DestroyIfExists(GameLobby.Instance);
+    }
 
-        if (GameMultiplayer.Instance != null)
+    private void DestroyIfExists(Behaviour singletonInstance)
+    {
+        if (singletonInstance != null)
         {
-            Destroy(GameMultiplayer.Instance.gameObject);
+            Destroy(singletonInstance.gameObject);
         }
     }
 }
